@@ -34,7 +34,7 @@ or
 
 2. copy the rfcmps to $RF2ROOT\Packages and run content management in rF2 to install them
 
-## Running HTML-UI
+### Running HTML-UI
 
 1. go to html-ui
 
