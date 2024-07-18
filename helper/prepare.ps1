@@ -20,5 +20,5 @@ $INSTALLED_VEHICLES=((gci -recurse -Path $RF2ROOT\Installed\Vehicles -Directory)
 # create the folder structure
 forEach ( $FOLDER in $INSTALLED_VEHICLES )
 {
- new-item -ItemType Directory -Name $FOLDER -Path ..\Vehicles
+ if (-not (Test-Path "..\Vehicles\$FOLDER")) {new-item -ItemType Directory -Name $FOLDER -Path ..\Vehicles }
 }
