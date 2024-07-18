@@ -29,3 +29,6 @@ $METADATACHANGE="SRJF-EXAMPLE-2024"
 $METADATADESCR="SRJF Example 2024 Skinpack"
 $METADATATITLE="simracingjustfair.org 2024"
 $METADATAPREVFILE="preview.jpg"
+
+# rf2_league_pkg_builder
+$VEHICLE_TYPE="gt3"
