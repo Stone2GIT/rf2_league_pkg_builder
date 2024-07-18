@@ -152,7 +152,7 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
   write-host "SteamCMD not found - downloading and installing."
 
   # check for folder and create it if not existing
-  if(-not(Test-Path "$CURRENTLOCATION\SteamCMD")) { mkdir $CURRENTLOCATION\SteamCMD }
+  #if(-not(Test-Path "$CURRENTLOCATION\SteamCMD")) { mkdir $CURRENTLOCATION\SteamCMD }
 
   # download SteamCMD and unpack it
   start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -OutFile $CURRENTLOCATION\steamcmd.zip" -NoNewWindow -Wait
