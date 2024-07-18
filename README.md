@@ -1,6 +1,6 @@
 # rf2_league_pkg_builder
 
-## Disclainer
+## Disclaimer
 
 All scripts are provided "as is" - no warranty for correct functionality.
 
