@@ -144,7 +144,7 @@ if ( Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf )
 if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
 {
  # check if steamcmd is already installed
- if(-not(Test-path "$CURRENTLOCATION\steamcmd.exe" -PathType leaf))
+ if(-not(Test-path "$CURRENTLOCATION\SteamCMD\steamcmd.exe" -PathType leaf))
  {
   write-host "SteamCMD not found - downloading and installing."
 
