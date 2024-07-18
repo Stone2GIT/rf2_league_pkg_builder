@@ -65,7 +65,7 @@ forEach ($COMPONENT in $COMPONENTS)
  elseif ( $CHECKFILES ) {
     # c:\Users\rfactor2\rf2ds\bin64\ModMgr.exe -m"car-skins.mas" *.json *.dds *.veh *.png *.ini
 
-    write-host "Erstelle masfile fuer RFCMP "$COMPONENT
+    write-host "Packing masfile for RFCMP "$COMPONENT
 
     # build argument list for modmgr
     $ARGUMENTS=" -m""$CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.json"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.dds"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.veh"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.png"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.ini"""
@@ -90,14 +90,14 @@ forEach ($COMPONENT in $COMPONENTS)
  if ( $MASFILE ) {
 
  # remove any previously (old) rfcmps of the component
- if ( "content\$($COMPONENT)*.rfcmp" )
+ if ( Test-Path "content\$($COMPONENT)*.rfcmp" -PathType Leaf )
  {
-  write-host "Lösche vorhergehende Version von "$COMPONENT" in Content Verzeichnis."
+  write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
   del $CURRENTLOCATION\content\$COMPONENT"*.rfcmp"
  }
 
  #
- write-host "Erstelle RFCMP fuer "$COMPONENT" mit Version "$CURRENTVERSION
+ write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
 
  # write the rfcmp definition
  $CMPINFO | Out-File "$CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat" -Encoding ASCII
@@ -110,6 +110,8 @@ forEach ($COMPONENT in $COMPONENTS)
 
  # delete the vehicle / rfcmp dat file
  #del $CURRENTLOCATION\$COMPONENT.dat
+
+ # move the definition file to log folder
  move-item $CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat Log\ -Force
 
  del $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
@@ -120,10 +122,9 @@ forEach ($COMPONENT in $COMPONENTS)
 # prepare Steam Workshop Upload
 #
 # if there is the template ... then ...
-if ( "$CURRENTLOCATION\metadata.tpl" )
+if ( Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf )
 {
-
- write-host "using Metadata template"
+ write-host "Using metadata template for metadata.vdf generation."
 
  # read in metadata template
  $METADATAINFO=(gc $CURRENTLOCATION\metadata.tpl)
@@ -137,18 +138,39 @@ if ( "$CURRENTLOCATION\metadata.tpl" )
 
  # write back template
  $METADATAINFO | Out-File "$CURRENTLOCATION\metadata.vdf" -Encoding ASCII
- del 
+ del $CURRENTLOCATION\metadata.tpl
 }
 
-if ( "$CURRENTLOCATION\metadata.vdf" )
+if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
 {
+ # check if steamcmd is already installed
+ if(-not(Test-path "$CURRENTLOCATION\steamcmd.exe" -PathType leaf))
+ {
+  write-host "SteamCMD not found - downloading and installing."
 
- write-host "Upload Steam Workshop"
+  # check for folder and create it if not existing
+  if(-not(Test-Path "$CURRENTLOCATION\SteamCMD")) { mkdir $CURRENTLOCATION\SteamCMD }
 
- # SteamCMD call ... remember to register the system with Steam auth code if configured (2FA)
- $ARGUMENTS=" +login loginname ""password"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
+  # download SteamCMD and unpack it
+  start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -OutFile $CURRENTLOCATION\steamcmd.zip" -NoNewWindow -Wait
+  start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\steamcmd.zip -DestinationPath $CURRENTLOCATION\SteamCMD" -NoNewWindow -Wait
+  
+  # run it once in order to configure it and check for Steam Guard
+  start-process "$CURRENTLOCATION\SteamCMD\steamcmd.exe" -ArgumentList " +quit" -NoNewWindow -Wait
+
+  # remove the downloaded archive
+  del $CURRENTLOCATION\steamcmd.zip
+ }
+
+ write-host "Uploading files to Steam workshop."
+
+ # building arguments for SteamCMD call ... remember to register the system with Steam guard code if configured (2FA)
+ $ARGUMENTS=" +login username ""password"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
  
+ # call Steamcmd and upload the stuff
  #start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
 }
 else 
-{ write-host "metadata.vdf missing for Steam workshop upload" }
+{ 
+ write-host "metadata.vdf missing for Steam workshop upload."
+}
