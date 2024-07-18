@@ -1,4 +1,4 @@
-# rf2_league_pkg_builder
+# rFactor 2 League Package Builder
 
 ## Disclaimer
 
