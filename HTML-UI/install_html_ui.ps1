@@ -33,5 +33,7 @@ $NGINXCONFIG=($NGINXCONFIG -replace "NGINX_INSTALLDIR","$NGINX_INSTALLDIR")
 $NGINXCONFIG | Out-File $CURRENTLOCATION\nginx\conf\nginx.conf
 
 # copy php configuration file
-copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\php\php.ini 
- 
+copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\php\php.ini
+
+# move the content
+move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI
