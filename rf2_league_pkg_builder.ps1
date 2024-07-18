@@ -21,7 +21,7 @@ if (-not (Test-Path "$CURRENTLOCATION\Content")) {New-Item -ItemType Directory -
 
 
 if ($args[0]) {
-    $COMPONENTS=$args[0]
+    $COMPONENTS=$args
     }
     else {
         # read in components from vehicles
