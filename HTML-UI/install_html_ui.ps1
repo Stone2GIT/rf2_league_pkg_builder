@@ -35,5 +35,8 @@ $NGINXCONFIG | Out-File $CURRENTLOCATION\nginx\conf\nginx.conf
 # copy php configuration file
 copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\php\php.ini
 
+# copy php files
+copy $CURRENTLOCATION\htmlfiles\* $CURRENTLOCATION\nginx\html\
+
 # move the content
-move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI
+move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper
