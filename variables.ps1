@@ -1,5 +1,5 @@
 # where is rfactor 2 located (currently program files (x86) is not supported)
-$RF2ROOT="$HOME\rf2ds"
+$RF2ROOT="c:\program files (x86)\steam\steamapps\common\rfactor 2"
 
 # where do we find the downloaded workshop packages
 $RF2WORKSHOPPKGS="$RF2ROOT\steamapps\workshop\content\365960"
