@@ -2,32 +2,38 @@
 
 ## General
 
-It is hard coded to rFactor 2 GT3 cars with version 3.60 at the moment.
+...
 
 ## Usage
 
-1. Change $RF2ROOT in variables.ps1
+### Preparation
 
-2. run prepare.ps1
+1. Change $RF2ROOT in variables.ps1 if rFactor 2 is not installed to default path
 
-3. copy skin files to vehicle folders
+2. change to helper and run prepare.ps1
+
+3. go back and copy skin files to vehicle folders
 
 4. copy or create veh, ini and all that other stuff of a skin package in vehicle folders
 
-5. run rf2_league_pkg_builder.ps1 
+### Running on CLI
 
-6. upload the rfcmps from content folder to steam workshop
+1. run rf2_league_pkg_builder.ps1 
+
+2. upload the rfcmps from content folder to steam workshop (if not enabled at end of script)
 
 or
 
-6. copy the rfcmps to $RF2ROOT\Packages and run content management in rF2 to install them
+2. copy the rfcmps to $RF2ROOT\Packages and run content management in rF2 to install them
 
-## PHP scripts
+## Running HTML-UI
 
-### General
+1. go to html-ui
 
-PHP scripts are intended for use with a HTTP server, e.g. nginx. 
+2. run install_html_ui.ps1
 
-### Attention
+3. start nginx and php by running start_nginx.bat
 
-PHP scripts are absolutely development at the moment.
+4. open browser and run http://localhost:9122
+
+
