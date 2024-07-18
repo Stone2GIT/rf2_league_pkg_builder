@@ -8,10 +8,6 @@ All scripts are provided "as is" - no warranty for correct functionality.
 
 If using automatic Steam workshop upload ... passwords (see end of rf2_league_pkg_builder.ps1) with some special characters will cause problems handling them in variables.
 
-## General
-
-...
-
 ## Usage
 
 ### Preparation
