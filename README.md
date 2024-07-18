@@ -12,13 +12,15 @@ If using automatic Steam workshop upload ... passwords (see end of rf2_league_pk
 
 ### Preparation
 
-1. Change $RF2ROOT in variables.ps1 if rFactor 2 is not installed to default path
+1. Clone the repo ...
 
-2. change to helper and run prepare.ps1
+2. Change $RF2ROOT in variables.ps1 if rFactor 2 is not installed to default path
 
-3. go back and copy skin files to vehicle folders
+3. change to helper and run prepare.ps1
 
-4. copy or create veh, ini and all that other stuff of a skin package in vehicle folders
+4. go back and copy skin files to vehicle folders
+
+5. copy or create veh, ini and all that other stuff of a skin package in vehicle folders
 
 ### Running on CLI
 
