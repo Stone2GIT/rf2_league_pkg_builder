@@ -14,3 +14,6 @@ $VEHICLE_TYPE="gt3"
 $STEAMUPLOAD="false"
 $STEAMUSER="changeme"
 $STEAMPASSWORD="changeme"
+
+# prefix for rfcmp files (will be $PREFIX-$COMPONENT-$CURRENTVERSION.rfcmp)
+$RFCMPPREFIX="changeme"

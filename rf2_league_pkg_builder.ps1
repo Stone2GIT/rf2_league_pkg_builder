@@ -12,9 +12,6 @@
 $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
 $CURRENTLOCATION=((Get-Location).Path)
 
-# prefix for rfcmp files (will be $PREFIX-$COMPONENT-$CURRENTVERSION.rfcmp)
-$PREFIX="SRC"
-
 # some folders
 if (-not (Test-Path "$CURRENTLOCATION\Vehicles")) { New-Item -ItemType Directory -Name $CURRENTLOCATION\Vehicles -Force | out-null }
 if (-not (Test-Path "$CURRENTLOCATION\Content")) {New-Item -ItemType Directory -Name $CURRENTLOCATION\Content -Force | out-null }
@@ -50,7 +47,7 @@ forEach ($COMPONENT in $COMPONENTS)
  # this will read the base version ... hopefully
  $BASEVERSION=((gci $RF2ROOT\Installed\Vehicles\$COMPONENT).Name|sort-object|select -first 1)
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
- $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$PREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
+ $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
  # lookup mas file in $COMPONENT
  if ( Test-Path $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas ) { del $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas }
