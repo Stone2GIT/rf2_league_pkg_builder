@@ -93,11 +93,16 @@ forEach ($COMPONENT in $COMPONENTS)
  if ( $MASFILE ) {
 
  # remove any previously (old) rfcmps of the component
- if ( Test-Path "content\$($COMPONENT)*.rfcmp" -PathType Leaf )
- {
-  write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
-  del $CURRENTLOCATION\content\$COMPONENT"*.rfcmp"
+ $OLDRFCMPS=((gci $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
+  
+ if ($RFCMPS){
+  forEach($OLDRFCMP in $OLDRFCMPS)
+  {
+   write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
+   del -Verbose $CURRENTLOCATION\content\$OLDRFCMP
+  }
  }
+
 
  #
  write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
