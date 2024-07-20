@@ -83,26 +83,21 @@ forEach ($COMPONENT in $COMPONENTS)
     
  }
 
- # write-host "Contents of "$MASFILE
- # gc $CURRENTLOCATION\$COMPONENT.txt
- # del $CURRENTLOCATION\$COMPONENT.txt
-
  # change vehicle.dat file to add mas file
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
 
- if ( $MASFILE ) {
-
  # remove any previously (old) rfcmps of the component
  $OLDRFCMPS=((gci $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
-  
- if ($RFCMPS){
+ 
+if ( $MASFILE ) {
+
+ if ($OLDRFCMPS[0]){
   forEach($OLDRFCMP in $OLDRFCMPS)
   {
    write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
    del -Verbose $CURRENTLOCATION\content\$OLDRFCMP
   }
  }
-
 
  #
  write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
