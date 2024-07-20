@@ -168,10 +168,11 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
  write-host "Uploading files to Steam workshop."
 
  # building arguments for SteamCMD call ... remember to register the system with Steam guard code if configured (2FA)
- $ARGUMENTS=" -login ""$STEAMUSER"" -password ""$STEAMPASSWORD"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
+ $ARGUMENTS=" -login ""$STEAMUSER"" ""$STEAMPASSWORD"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
  
   # call Steamcmd and upload the stuff
  if ( ($STEAMUPLOAD -eq "true") -and ($STEAMUSER -ne "changeme") -and ($STEAMPASSWORD -ne "changeme") ) {
+  # would we avoid PHP timeout if -Wait is being removed?
   start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
  } 
 
