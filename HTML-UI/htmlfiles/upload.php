@@ -68,7 +68,7 @@ if ($uploadOk == 0) {
 	// define the env for running powershell script
 	//
 	$psPath = "powershell.exe";
-	$psDIR = "C:\\nginx\\html\\";
+	$psDIR = getcwd()."\\";
 	$psScript = "rf2_league_pkg_builder.ps1 ".$target_vehicle;
 	$runScript = $psDIR. $psScript;
 	$runCMD = $psPath." ".$runScript." 2>&1"; 
