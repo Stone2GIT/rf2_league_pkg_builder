@@ -168,10 +168,13 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
  write-host "Uploading files to Steam workshop."
 
  # building arguments for SteamCMD call ... remember to register the system with Steam guard code if configured (2FA)
- $ARGUMENTS=" +login username ""password"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
+ $ARGUMENTS=" -login ""$STEAMUSER"" -password ""$STEAMPASSWORD"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
  
- # call Steamcmd and upload the stuff
- #start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
+  # call Steamcmd and upload the stuff
+ if ( ($STEAMUPLOAD -eq "true") -and ($STEAMUSER -ne "changeme") -and ($STEAMPASSWORD -ne "changeme") ) {
+  start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
+ } 
+
 }
 else 
 { 

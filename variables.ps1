@@ -9,3 +9,8 @@ $METADATAPREVFILE="preview.jpg"
 
 # what type of vehicle to look for in $RF2ROOT\Installed\Vehicles
 $VEHICLE_TYPE="gt3"
+
+# automatic SteamUpload, change ALL parameters
+$STEAMUPLOAD="false"
+$STEAMUSER="changeme"
+$STEAMPASSWORD="changeme"
