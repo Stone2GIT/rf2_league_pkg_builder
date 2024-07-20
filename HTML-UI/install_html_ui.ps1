@@ -18,7 +18,7 @@ start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https:/
 write-host "Unpacking ..."
 start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\nginx.zip -DestinationPath $CURRENTLOCATION\" -NoNewWindow -Wait
  move $CURRENTLOCATION\nginx-1.27.0 $CURRENTLOCATION\nginx
-start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\php.zip -DestinationPath $CURRENTLOCATION\php" -NoNewWindow -Wait
+start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\php.zip -DestinationPath $CURRENTLOCATION\nginx\php" -NoNewWindow -Wait
 
 # removing archives
 del *.zip
@@ -30,13 +30,14 @@ $NGINX_INSTALLDIR=($NGINX_INSTALLDIR -replace "\\","/")
 $NGINXCONFIG=(gc $CURRENTLOCATION\configfiles\nginx\conf\nginx.conf)
 $NGINXCONFIG=($NGINXCONFIG -replace "NGINX_INSTALLDIR","$NGINX_INSTALLDIR")
 
-$NGINXCONFIG | Out-File $CURRENTLOCATION\nginx\conf\nginx.conf
+$NGINXCONFIG | Out-File $CURRENTLOCATION\nginx\conf\nginx.conf -Encoding ascii
 
 # copy php configuration file
-copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\php\php.ini
+copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\nginx\php\php.ini
 
 # copy php files
 copy $CURRENTLOCATION\htmlfiles\* $CURRENTLOCATION\nginx\html\
 
 # move the content
-move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper
+#move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper
+Copy-Item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper -Recurse -Force

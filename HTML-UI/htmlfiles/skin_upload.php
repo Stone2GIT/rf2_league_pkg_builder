@@ -44,7 +44,7 @@ function getDirs($path){
   <label for="selected_vehicle">Choose your car:</label>
 	<select name="selected_vehicle">  
 		<?php   
-		$vehicle_folders = "./vehicles";
+		$vehicle_folders = "vehicles";
 		foreach(getDirs($vehicle_folders) as $vehicle)  
 			{  
 			echo '<option class="'.$vehicle_folders.'">'. $vehicle . '</option>';  
