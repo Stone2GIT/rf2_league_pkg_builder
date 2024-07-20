@@ -122,7 +122,8 @@ if ( $MASFILE ) {
 # prepare Steam Workshop Upload
 #
 # if there is the template ... then ...
-if ( Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf )
+#if ( Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf )
+ if ( (Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf) -and (!(Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf)) ) 
 {
  write-host "Using metadata template for metadata.vdf generation."
 
