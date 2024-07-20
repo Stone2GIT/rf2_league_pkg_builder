@@ -17,7 +17,9 @@ start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https:/
 # unpacking
 write-host "Unpacking ..."
 start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\nginx.zip -DestinationPath $CURRENTLOCATION\" -NoNewWindow -Wait
- move $CURRENTLOCATION\nginx-1.27.0 $CURRENTLOCATION\nginx
+ if (Test-Path("$CURRENTLOCATION\\nginx")) { del -Recurse $CURRENTLOCATION\nginx }
+ move-item $CURRENTLOCATION\nginx-1.27.0 $CURRENTLOCATION\nginx -Force
+
 start-process -FilePath powershell -ArgumentList "Expand-Archive -Force $CURRENTLOCATION\php.zip -DestinationPath $CURRENTLOCATION\nginx\php" -NoNewWindow -Wait
 
 # removing archives
@@ -40,4 +42,4 @@ copy $CURRENTLOCATION\htmlfiles\* $CURRENTLOCATION\nginx\html\
 
 # move the content
 #move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper
-Copy-Item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper -Recurse -Force
+Copy-Item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI,helper -Recurse -Force
