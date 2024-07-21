@@ -5,6 +5,13 @@
 #
 
 # Notes
+#
+# "remove" extension from filename
+# (gci ./alt061.dds).BaseName
+# 	alt061
+#
+# extracting characters from filename: (gci).BaseName.Substring(0,3)
+
 
 # source variables
 . ./variables.ps1
