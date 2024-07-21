@@ -6,7 +6,9 @@ All scripts are provided "as is" - no warranty for correct functionality.
 
 ## Note
 
-If using automatic Steam workshop upload ... passwords (see end of rf2_league_pkg_builder.ps1) with some special characters will cause problems handling them in variables.
+If using automatic Steam workshop upload passwords with some special characters will cause problems handling them in variables.
+
+Remember to run steamcmd.exe with valid login data once before if Steam Guard e.g. is being used.
 
 ## Quick start guide
 
