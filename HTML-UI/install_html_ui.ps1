@@ -34,12 +34,15 @@ $NGINXCONFIG=($NGINXCONFIG -replace "NGINX_INSTALLDIR","$NGINX_INSTALLDIR")
 
 $NGINXCONFIG | Out-File $CURRENTLOCATION\nginx\conf\nginx.conf -Encoding ascii
 
-# copy php configuration file
-copy $CURRENTLOCATION\configfiles\php\php.ini $CURRENTLOCATION\nginx\php\php.ini
+# configure php
+$PHPCONFIG=(gc $CURRENTLOCATION\configfiles\php\php.ini)
+$PHPCONFIG=($PHPCONFIG -replace "NGINX_INSTALLDIR","$NGINX_INSTALLDIR")
+
+$PHPCONFIG | Out-File $CURRENTLOCATION\nginx\php\php.ini -Encoding ascii
 
 # copy php files
 copy $CURRENTLOCATION\htmlfiles\* $CURRENTLOCATION\nginx\html\
 
 # move the content
-#move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude ..\HTML-UI,..\helper
-Copy-Item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI,helper -Recurse -Force
+move-item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI,helper -Force
+#Copy-Item ..\* $NGINX_INSTALLDIR\html\ -Exclude HTML-UI,helper -Recurse -Force
