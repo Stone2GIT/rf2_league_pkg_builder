@@ -1,5 +1,9 @@
 # rFactor 2 League Package Builder
 
+## General
+
+This script will build rfcmp skin packages for installed cars and upload them to Steam Workshop (if enabled).
+
 ## Disclaimer
 
 All scripts are provided "as is" - no warranty for correct functionality.
