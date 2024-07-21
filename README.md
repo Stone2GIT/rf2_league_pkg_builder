@@ -26,7 +26,7 @@ If using automatic Steam workshop upload ... passwords (see end of rf2_league_pk
 
 1. run rf2_league_pkg_builder.ps1 
 
-2. upload the rfcmps from content folder to steam workshop (if not enabled at end of script)
+2. upload the rfcmps from content folder to steam workshop (if variables are not set in variables.ps1)
 
 or
 
