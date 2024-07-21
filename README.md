@@ -26,11 +26,13 @@ If using automatic Steam workshop upload ... passwords (see end of rf2_league_pk
 
 1. run rf2_league_pkg_builder.ps1 
 
-2. upload the rfcmps from content folder to steam workshop (if variables are not set in variables.ps1)
+2. copy existing metadata.vdf from previous upload to rf2_league_pkg_builder folder
+
+3. upload the rfcmps from content folder to steam workshop (if variables are not set in variables.ps1)
 
 or
 
-2. copy the rfcmps to $RF2ROOT\Packages and run content management in rF2 to install them
+3. copy the rfcmps to $RF2ROOT\Packages and run content management in rF2 to install them
 
 ### Running HTML-UI
 
@@ -38,8 +40,8 @@ or
 
 2. run install_html_ui.ps1
 
-3. start nginx and php by running start_nginx.bat
+3. copy existing metadata.vdf from previous upload to rf2_league_pkg_builder folder
 
-4. open browser and run http://localhost:9122
+4. start nginx and php by running start_nginx.bat
 
-
+5. open browser and run http://localhost:9122
