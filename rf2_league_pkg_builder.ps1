@@ -19,10 +19,7 @@
 $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
 $CURRENTLOCATION=((Get-Location).Path)
 
-# some folders
-if (-not (Test-Path "$CURRENTLOCATION\Vehicles")) { New-Item -ItemType Directory -Name $CURRENTLOCATION\Vehicles -Force | out-null }
-if (-not (Test-Path "$CURRENTLOCATION\Content")) {New-Item -ItemType Directory -Name $CURRENTLOCATION\Content -Force | out-null }
-
+# running prepare.ps1? 
 
 if ($args[0]) {
     $COMPONENTS=$args
@@ -42,7 +39,13 @@ if ( $COMPONENTS -eq "" ) {
 forEach ($COMPONENT in $COMPONENTS)
 {
 
- #write-host "Building "$COMPONENT
+ # this is necessary, because mod building is case sensitive we need the exact component name in rfcmp as in dat file
+ if ( $COMPONENT -eq  ((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT") )
+  {
+   $COMPONENT=((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT")
+  }
+ 
+ write-host "Building "$COMPONENT
 
  # get the information for the rfcmp from template
  $CMPINFO=(gc $CURRENTLOCATION\vehicle.dat)
