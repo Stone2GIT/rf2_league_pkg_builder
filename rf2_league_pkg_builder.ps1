@@ -20,7 +20,14 @@ $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
 $CURRENTLOCATION=((Get-Location).Path)
 
 # running prepare.ps1? 
+if (-not (Test-Path $CURRENTLOCATION\Vehicles -Type Directory))
+ {
+  write-host "Please run prepare.ps1."
+  timeout /t 10
+  exit 1
+ }
 
+# arguments given?
 if ($args[0]) {
     $COMPONENTS=$args
     }
