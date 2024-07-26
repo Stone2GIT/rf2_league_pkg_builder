@@ -20,7 +20,7 @@ $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
 $CURRENTLOCATION=((Get-Location).Path)
 
 # running prepare.ps1? 
-if (-not (Test-Path $CURRENTLOCATION\Vehicles -Type Directory))
+if (-not (Test-Path "$CURRENTLOCATION\\Vehicles" -Type Directory))
  {
   write-host "Please run prepare.ps1."
   timeout /t 10
@@ -52,7 +52,7 @@ forEach ($COMPONENT in $COMPONENTS)
    $COMPONENT=((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT")
   }
  
- write-host "Building "$COMPONENT
+ write-host "Checking "$COMPONENT
 
  # get the information for the rfcmp from template
  $CMPINFO=(gc $CURRENTLOCATION\vehicle.dat)
