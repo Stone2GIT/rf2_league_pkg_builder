@@ -47,13 +47,13 @@ forEach ($COMPONENT in $COMPONENTS)
 {
 
  # this is necessary, because mod building is case sensitive we need the exact component name in rfcmp as in dat file
+ write-host "Checking "$COMPONENT
+
  if ( $COMPONENT -eq  ((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT") )
   {
    $COMPONENT=((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT")
   }
  
- write-host "Checking "$COMPONENT
-
  # get the information for the rfcmp from template
  $CMPINFO=(gc $CURRENTLOCATION\vehicle.dat)
 
@@ -66,33 +66,46 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
- # lookup mas file in $COMPONENT
- if ( Test-Path $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas ) { del $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas }
- $MASFILE=(((gci -Path $CURRENTLOCATION\Vehicles\$COMPONENT).Name) | select-string -Pattern ".mas")
+ # lookup if there is an old mas file in $COMPONENT
+ if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas" ) 
+  { 
+   del $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas 
+  }
 
- $CHECKFILES=(gci -Path $CURRENTLOCATION\Vehicles\$COMPONENT)
+ # is there any other ...?
+ $MASFILE=(((gci -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
+
+ # get all files which are in $COMPONENT
+ $CHECKFILES=(gci -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
  
  # if a mas file already exists or not ...
  if ( $MASFILE ) {
     write-host "MAS file found "$MASFILE
+    write-host "Building RFCMP for "$COMPONENT
 
+    # arguments for modmgr
     $ARGUMENTS=" -l""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Log\content-existing-masfile-$COMPONENT-$CURRENTVERSION.txt"" "
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
     }
  elseif ( $CHECKFILES ) {
-    # c:\Users\rfactor2\rf2ds\bin64\ModMgr.exe -m"car-skins.mas" *.json *.dds *.veh *.png *.ini
 
     write-host "Packing masfile for RFCMP "$COMPONENT
 
-    # build argument list for modmgr
-    $ARGUMENTS=" -m""$CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.json"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.dds"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.veh"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.png"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.ini"""
-    
-    # run modmgr to build rfcmp
-    start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
-
+    # as this is the name of the mas file if we build it ...
     $MASFILE="car-skins.mas"
 
+    # build argument list for modmgr
+    $ARGUMENTS=" -m""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.json"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.dds"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.veh"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.png"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.ini"""
+    
+    # run modmgr to build mas file
+    start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
+
+    write-host "Building RFCMP for "$COMPONENT
+
+    # building arguments to build rfcmp
     $ARGUMENTS=" -l""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Log\content-generated-masfile-$COMPONENT-$CURRENTVERSION.txt"" "
+
+    # run modmgr to build rfcmp file
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
     
  }
@@ -139,7 +152,6 @@ if ( $MASFILE ) {
 # prepare Steam Workshop Upload
 #
 # if there is the template ... then ...
-#if ( Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf )
  if ( (Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf) -and (!(Test-Path "$CURRENTLOCATION\metadata.tpl" -PathType Leaf)) ) 
 {
  write-host "Using metadata template for metadata.vdf generation."
@@ -167,7 +179,7 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
   write-host "SteamCMD not found - downloading and installing."
 
   # check for folder and create it if not existing
-  #if(-not(Test-Path "$CURRENTLOCATION\SteamCMD")) { mkdir $CURRENTLOCATION\SteamCMD }
+  if(-not(Test-Path "$CURRENTLOCATION\SteamCMD" -PathType Directory)) { mkdir $CURRENTLOCATION\SteamCMD }
 
   # download SteamCMD and unpack it
   start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -OutFile $CURRENTLOCATION\steamcmd.zip" -NoNewWindow -Wait
