@@ -16,7 +16,11 @@
 # source variables
 . ./variables.ps1
 
-$CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
+if (-not ( "$CURRENTVERSION" )) 
+ {
+  $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
+ }
+
 $CURRENTLOCATION=((Get-Location).Path)
 
 # running prepare.ps1? 

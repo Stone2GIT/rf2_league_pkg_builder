@@ -17,3 +17,6 @@ $STEAMPASSWORD="changeme"
 
 # prefix for rfcmp files (will be $PREFIX-$COMPONENT-$CURRENTVERSION.rfcmp)
 $RFCMPPREFIX="changeme"
+
+# version for packages - if left blank todays date will be used
+$CURRENTVERSION=""
