@@ -68,7 +68,7 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^Version=.*","Version=$CURRENTVERSION")
 
  # this will read the base version ... hopefully
- $BASEVERSION=((gci $RF2ROOT\Installed\Vehicles\$COMPONENT).Name|sort-object|select -first 1)
+ $BASEVERSION=(((gci $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
