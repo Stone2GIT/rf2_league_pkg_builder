@@ -24,7 +24,7 @@ if (-not ( "$CURRENTVERSION" ))
 $CURRENTLOCATION=((Get-Location).Path)
 
 # running prepare.ps1? 
-if (-not (Test-Path "$CURRENTLOCATION\\Vehicles" -Type Directory))
+if (-not (Test-Path "$CURRENTLOCATION\\Vehicles" -PathType Container))
  {
   write-host "Please run prepare.ps1."
   timeout /t 10
@@ -71,9 +71,9 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
  # lookup if there is an old mas file in $COMPONENT
- if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas" ) 
+ if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas" ) 
   { 
-   del $CURRENTLOCATION\Vehicles\$COMPONENT\car-skins.mas 
+   del $CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas 
   }
 
  # is there any other ...?
@@ -96,7 +96,7 @@ forEach ($COMPONENT in $COMPONENTS)
     write-host "Packing masfile for RFCMP "$COMPONENT
 
     # as this is the name of the mas file if we build it ...
-    $MASFILE="car-skins.mas"
+    $MASFILE="$RFCMPPREFIX-skins.mas"
 
     # build argument list for modmgr
     $ARGUMENTS=" -m""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.json"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.dds"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.veh"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.png"" ""$CURRENTLOCATION\Vehicles\$COMPONENT\*.ini"""
@@ -113,6 +113,7 @@ forEach ($COMPONENT in $COMPONENTS)
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
     
  }
+ #exit 1
 
  # change vehicle.dat file to add mas file
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
@@ -122,7 +123,7 @@ forEach ($COMPONENT in $COMPONENTS)
  
 if ( $MASFILE ) {
 
- if ($OLDRFCMPS[0]){
+ if ($OLDRFCMPS){
   forEach($OLDRFCMP in $OLDRFCMPS)
   {
    write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
