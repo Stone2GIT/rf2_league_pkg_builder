@@ -1,5 +1,5 @@
 # where is rfactor 2 located (currently program files (x86) is not supported)
-$RF2ROOT="c:\program files (x86)\steam\steamapps\common\rfactor 2"
+$RF2ROOT="$HOME\Desktop\rf2ds"
 
 # define metadata for Steam Workshop Upload
 $METADATACHANGE="SRJF-EXAMPLE-2024"
@@ -16,7 +16,10 @@ $STEAMUSER="changeme"
 $STEAMPASSWORD="changeme"
 
 # prefix for rfcmp files (will be $PREFIX-$COMPONENT-$CURRENTVERSION.rfcmp)
-$RFCMPPREFIX="changeme"
+$RFCMPPREFIX="SRC"
+
+#
+$CURRENTVERSIONPREFIX="3.61-GTW"
 
 # version for packages - if left blank todays date will be used
-$CURRENTVERSION=""
+$CURRENTVERSION="$CURRENTVERSIONREFIX"+"-07"
