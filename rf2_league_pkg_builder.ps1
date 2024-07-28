@@ -11,6 +11,8 @@
 # 	alt061
 #
 # extracting characters from filename: (gci).BaseName.Substring(0,3)
+# getting baseversion ...
+# this will do: ((gci -Directory).Name) -match '\d{1,}\.\d{1,}$'| select-object -first 1
 
 
 # source variables
