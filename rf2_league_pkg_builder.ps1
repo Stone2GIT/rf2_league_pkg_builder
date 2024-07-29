@@ -131,6 +131,9 @@ forEach ($COMPONENT in $COMPONENTS)
 
        # read checksums.txt and write back entries which do not match $FILENAME
        Set-Content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" -Value (get-content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" | Select-String -Pattern $FILENAME -NotMatch)
+
+      # set a marker that the components RFCMP needs to be generated new
+      $UPDATERFCMP=1
       }
    }
 
