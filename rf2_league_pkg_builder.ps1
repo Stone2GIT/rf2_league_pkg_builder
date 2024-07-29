@@ -99,12 +99,12 @@ forEach ($COMPONENT in $COMPONENTS)
     remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
     }
 
- # get all files which are in $COMPONENT in order to build checksum
- $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
+  # get all files which are in $COMPONENT in order to build checksum
+ $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name
  forEach ($SKINFILE in $SKINFILES)
  {
-     $SKINFLE+":"+(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash| Out-File $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
- }
+     $SKINFILE+":"+(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash| Out-File -Append $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+ } 
 
     write-host "Packing masfile for RFCMP "$COMPONENT
 
