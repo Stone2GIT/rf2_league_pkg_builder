@@ -14,6 +14,9 @@
 #     { write-host "Hello" }
 #  }
 
+#
+# thinking ... Set-Content -Path "C:\temp\Newtext.txt" -Value (get-content -Path "c:\Temp\Newtext.txt" | Select-String -Pattern 'H\|159' -NotMatch)
+
 # we need this for UNiX time in seconds
 [DateTimeOffset]::Now.ToUnixTimeSeconds()
 
@@ -113,6 +116,23 @@ forEach ($COMPONENT in $COMPONENTS)
 
  # get all files which are in $COMPONENT in order to build checksum
  $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT" -Exclude checksums.txt).Name
+
+ # are there any filenames in checksums.txt which are not in $COMPONENT?
+ #
+ # read checksums from checksums.txt
+ $CHECKSUMS=(Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt")
+ 
+ # compare each line with entries in $SKINFILES
+  forEach ($CHECKSUM in $CHECKSUMS) 
+   { $FILENAME=(($CHECKSUM) -split('=') | select-object -First 1) 
+     if (-not($SKINFILES -contains $FILENAME))
+      { 
+       write-host "Entry of checksums.txt not found in list of skinfiles - removing from checksums.txt." 
+
+       # read checksums.txt and write back entries which do not match $FILENAME
+       Set-Content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.bak" -Value (get-content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" | Select-String -Pattern '^$FILENAME=' -NotMatch)
+      }
+   }
 
  # check each file in SKINFILES
  forEach ($SKINFILE in $SKINFILES)
