@@ -8,18 +8,19 @@ This script will build rfcmp skin packages for installed cars and upload them to
 
 All scripts are provided "as is" - no warranty for correct functionality.
 
-## Note
+## Note(s)
 
-If using automatic Steam workshop upload passwords with some special characters will cause problems handling them in variables.
+- if using automatic Steam workshop upload passwords with some special characters will cause problems handling them in variables.
 
-Remember to run steamcmd.exe with valid login data once before if Steam Guard e.g. is being used.
+- remember to run steamcmd.exe with valid login data once before if Steam Guard e.g. is being used.
+
+- generating RFCMPs for all components provided (updating only will follow in the future)
 
 ## Quick start guide
 
-### Videos
+### Video tutorials
 
-- https://youtu.be/n_aitsEcyPI
-- https://youtu.be/ayV7uHU4uvU
+- https://www.youtube.com/playlist?list=PLFHp1FDr-Txme3ILLzNw6BfuY-M_7CnwQ
 
 ### Preparation
 
