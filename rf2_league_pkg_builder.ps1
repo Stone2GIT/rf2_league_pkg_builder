@@ -14,6 +14,7 @@
 # getting baseversion ...
 # this will do: ((gci -Directory).Name) -match '\d{1,}\.\d{1,}$'| select-object -first 1
 
+[DateTimeOffset]::Now.ToUnixTimeSeconds()
 
 # source variables
 . ./variables.ps1
@@ -66,6 +67,12 @@ forEach ($COMPONENT in $COMPONENTS)
  # change rfcmp template
  $CMPINFO=($CMPINFO -replace "^Name=.*","Name=$COMPONENT")
  $CMPINFO=($CMPINFO -replace "^Version=.*","Version=$CURRENTVERSION")
+
+ # set UNiX timestamp / date
+ #$UNIXTIME = Get-Date #or any other command to get DateTime object
+ $UNIXTIME=(([DateTimeOffset](Get-Date)).ToUnixTimeSeconds())
+ $CMPINFO=($CMPINFO -replace "^Date=.*","Date=$UNIXTIME")
+
 
  # this will read the base version ... hopefully
  $BASEVERSION=(((gci $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
