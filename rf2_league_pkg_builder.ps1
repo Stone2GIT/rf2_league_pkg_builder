@@ -6,27 +6,23 @@
 
 # Notes
 #
-# "remove" extension from filename
-# (gci ./alt061.dds).BaseName
-# 	alt061
-#
-# extracting characters from filename: (gci).BaseName.Substring(0,3)
-# getting baseversion ...
-# this will do: ((gci -Directory).Name) -match '\d{1,}\.\d{1,}$'| select-object -first 1
+# - checksum of file(s): (Get-FileHash <file>).hash
 
 [DateTimeOffset]::Now.ToUnixTimeSeconds()
 
 # source variables
 . ./variables.ps1
 
+# if CURRENTVERSION is not defined in variables.ps1
 if (-not ( "$CURRENTVERSION" )) 
  {
-  $CURRENTVERSION=(Get-Date -Format "yyyy.MM.dd")
+  $CURRENTVERSION=(Get-Date -Format "yyyyMMdd")
  }
 
+# get working directiry
 $CURRENTLOCATION=((Get-Location).Path)
 
-# running prepare.ps1? 
+# has  prepare.ps1 been run?
 if (-not (Test-Path "$CURRENTLOCATION\\Vehicles" -PathType Container))
  {
   write-host "Please run prepare.ps1."
@@ -40,29 +36,29 @@ if ($args[0]) {
     }
     else {
         # read in components from vehicles
-        $COMPONENTS=((gci -Path Vehicles).Name)
+        $COMPONENTS=((Get-ChildItem -Path Vehicles).Name)
     }
 
-
+# if we cannot find any components
 if ( $COMPONENTS -eq "" ) {
     write-host "Please copy folders and files to VEHICLES."
     exit 1
     }
 
-# what to do ...
+# what to do with each component found
 forEach ($COMPONENT in $COMPONENTS)
 {
 
- # this is necessary, because mod building is case sensitive we need the exact component name in rfcmp as in dat file
  write-host "Checking "$COMPONENT
 
- if ( $COMPONENT -eq  ((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT") )
+ # this is necessary, because mod building is case sensitive we need the exact component name in rfcmp as in dat file
+ if ( $COMPONENT -eq  ((Get-ChildItem -Path vehicles).Name|select-string -Pattern "$COMPONENT") )
   {
-   $COMPONENT=((gci -Path vehicles).Name|select-string -Pattern "$COMPONENT")
+   $COMPONENT=((Get-ChildItem -Path vehicles).Name|select-string -Pattern "$COMPONENT")
   }
  
  # get the information for the rfcmp from template
- $CMPINFO=(gc $CURRENTLOCATION\vehicle.dat)
+ $CMPINFO=(get-content $CURRENTLOCATION\vehicle.dat)
 
  # change rfcmp template
  $CMPINFO=($CMPINFO -replace "^Name=.*","Name=$COMPONENT")
@@ -75,21 +71,21 @@ forEach ($COMPONENT in $COMPONENTS)
 
 
  # this will read the base version ... hopefully
- $BASEVERSION=(((gci $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
+ $BASEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
  # lookup if there is an old mas file in $COMPONENT
  if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas" ) 
   { 
-   del $CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas 
+   remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas 
   }
 
  # is there any other ...?
- $MASFILE=(((gci -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
+ $MASFILE=(((Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
 
  # get all files which are in $COMPONENT
- $CHECKFILES=(gci -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
+ $CHECKFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
  
  # if a mas file already exists or not ...
  if ( $MASFILE ) {
@@ -128,7 +124,7 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
 
  # remove any previously (old) rfcmps of the component
- $OLDRFCMPS=((gci $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
+ $OLDRFCMPS=((Get-ChildItem $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
  
 if ( $MASFILE ) {
 
@@ -136,7 +132,7 @@ if ( $MASFILE ) {
   forEach($OLDRFCMP in $OLDRFCMPS)
   {
    write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
-   del -Verbose $CURRENTLOCATION\content\$OLDRFCMP
+   remove-item -Verbose $CURRENTLOCATION\content\$OLDRFCMP
   }
  }
 
@@ -153,12 +149,12 @@ if ( $MASFILE ) {
  start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
 
  # delete the vehicle / rfcmp dat file
- #del $CURRENTLOCATION\$COMPONENT.dat
+ #remove-item $CURRENTLOCATION\$COMPONENT.dat
 
  # move the definition file to log folder
  move-item $CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat Log\ -Force
 
- del $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
+ remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
  }
 
 }
@@ -171,7 +167,7 @@ if ( $MASFILE ) {
  write-host "Using metadata template for metadata.vdf generation."
 
  # read in metadata template
- $METADATAINFO=(gc $CURRENTLOCATION\metadata.tpl)
+ $METADATAINFO=(get-content $CURRENTLOCATION\metadata.tpl)
 
  # change the metadata template
  $METADATAINFO=($METADATAINFO -replace """contentfolder"".*","""contentfolder"" ""$CURRENTLOCATION\Content""")
@@ -182,18 +178,18 @@ if ( $MASFILE ) {
 
  # write back template
  $METADATAINFO | Out-File "$CURRENTLOCATION\metadata.vdf" -Encoding ASCII
- del $CURRENTLOCATION\metadata.tpl
+ remove-item $CURRENTLOCATION\metadata.tpl
 }
 
 if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
 {
  # check if steamcmd is already installed
- if(-not(Test-path "$CURRENTLOCATION\SteamCMD\steamcmd.exe" -PathType leaf))
+ if (-not(Test-path "$CURRENTLOCATION\SteamCMD\steamcmd.exe" -PathType leaf))
  {
   write-host "SteamCMD not found - downloading and installing."
 
   # check for folder and create it if not existing
-  if(-not(Test-Path "$CURRENTLOCATION\SteamCMD" -PathType Directory)) { mkdir $CURRENTLOCATION\SteamCMD }
+  if (-not(Test-Path "$CURRENTLOCATION\SteamCMD" -PathType Directory)) { mkdir $CURRENTLOCATION\SteamCMD }
 
   # download SteamCMD and unpack it
   start-process -FilePath powershell -ArgumentList "Invoke-RestMethod -Uri https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -OutFile $CURRENTLOCATION\steamcmd.zip" -NoNewWindow -Wait
@@ -203,7 +199,7 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
   start-process "$CURRENTLOCATION\SteamCMD\steamcmd.exe" -ArgumentList " +quit" -NoNewWindow -Wait
 
   # remove the downloaded archive
-  del $CURRENTLOCATION\steamcmd.zip
+  remove-item $CURRENTLOCATION\steamcmd.zip
  }
 
  write-host "Uploading files to Steam workshop."
