@@ -130,7 +130,7 @@ forEach ($COMPONENT in $COMPONENTS)
        write-host "Entry of checksums.txt not found in list of skinfiles - removing from checksums.txt." 
 
        # read checksums.txt and write back entries which do not match $FILENAME
-       Set-Content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.bak" -Value (get-content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" | Select-String -Pattern '^$FILENAME=' -NotMatch)
+       Set-Content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" -Value (get-content -Path "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt" | Select-String -Pattern $FILENAME -NotMatch)
       }
    }
 
