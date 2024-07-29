@@ -1,10 +1,18 @@
- #
+#
 # simple script to build league skin package
 
 # Stone, 07/2024, info@simracingjustfair.org
 #
 
 # Notes
+#
+# this will extract the filenames for checksums.txt
+# $CHECKSUMS=(get-content checksums.txt)
+# forEach ($CHECKSUM in $CHECKSUMS) 
+#  { $FILENAME=(($CHECKSUM) -split('=') | select-object -First 1) 
+#    if ($SKINFILES -contains $FILENAME) 
+#     { write-host "Hello" }
+#  }
 
 # we need this for UNiX time in seconds
 [DateTimeOffset]::Now.ToUnixTimeSeconds()
