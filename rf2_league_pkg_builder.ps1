@@ -1,4 +1,4 @@
-#
+ #
 # simple script to build league skin package
 
 # Stone, 07/2024, info@simracingjustfair.org
@@ -99,13 +99,50 @@ forEach ($COMPONENT in $COMPONENTS)
     remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
     }
 
-  # get all files which are in $COMPONENT in order to build checksum
- $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name
+ # get all files which are in $COMPONENT in order to build checksum
+ if (-not (Test-Path $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt))
+ {
+  New-Item -ItemType File -Path $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+ }
+
+ $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT" -Exclude checksums.txt).Name
  forEach ($SKINFILE in $SKINFILES)
  {
-     $SKINFILE+":"+(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash| Out-File -Append $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
- } 
+     $CHECKSUM=(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash
 
+     $SUM2COMPARE=((Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt"|select-string -Pattern $SKINFILE+"=") -split("=") | select-object -Last 1)
+
+    if ($CHECKSUM -ne $SUM2COMPARE) 
+     {
+      write-host "Checksum for "$SKINFILE" does not match, update required."
+
+      if ( (Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt"|select-string -Pattern $SKINFILE+":") )
+      {
+       $CHECKSUMFILE=(Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt")
+       $CHECKSUMFILE -replace "$SKINFILE=.*","$SKINFILE=$SUM2COMPARE" | Out-File $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+      } else
+      {
+       $SKINFILE+"="+$CHECKSUM | Out-File -Append $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+      }
+
+      $UPDATERFCMP=1
+     }
+ }
+
+  # remove any previously (old) rfcmps of the component
+ $OLDRFCMPS=((Get-ChildItem $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
+ 
+# remove old RFCMPs ...
+ if ($OLDRFCMPS){
+  forEach($OLDRFCMP in $OLDRFCMPS)
+  {
+   write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
+   remove-item $CURRENTLOCATION\content\$OLDRFCMP
+  }
+ }
+
+ if ($UPDATERFCMP -eq 1)
+ {
     write-host "Packing masfile for RFCMP "$COMPONENT
 
     # as this is the name of the mas file if we build it ...
@@ -130,17 +167,7 @@ forEach ($COMPONENT in $COMPONENTS)
  # change vehicle.dat file to add mas file
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
 
- # remove any previously (old) rfcmps of the component
- $OLDRFCMPS=((Get-ChildItem $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
- 
-# remve old RFCMPs ...
- if ($OLDRFCMPS){
-  forEach($OLDRFCMP in $OLDRFCMPS)
-  {
-   write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
-   remove-item $CURRENTLOCATION\content\$OLDRFCMP
-  }
- }
+
 
  #
  write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
@@ -161,6 +188,9 @@ forEach ($COMPONENT in $COMPONENTS)
  move-item $CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat Log\ -Force
 
  remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
+ }
+
+ $UPDATERFCMP=0
  }
 
 # prepare Steam Workshop Upload
@@ -221,4 +251,4 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
 else 
 { 
  write-host "metadata.vdf missing for Steam workshop upload."
-}
+} 
