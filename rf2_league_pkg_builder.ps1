@@ -103,7 +103,7 @@ forEach ($COMPONENT in $COMPONENTS)
  $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
  forEach ($SKINFILE in $SKINFILES)
  {
-     $SKINFLE+":"+(Get-FileHash $SKINFILE).hash| Out-File $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+     $SKINFLE+":"+(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash| Out-File $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
  }
 
     write-host "Packing masfile for RFCMP "$COMPONENT
