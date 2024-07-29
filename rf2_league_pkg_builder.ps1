@@ -70,8 +70,10 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^Date=.*","Date=$UNIXTIME")
 
 
- # this will read the base version ... hopefully
+ # this will read the base version from component directory ... hopefully
  $BASEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
+
+ # change vehicle.dat
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
 
