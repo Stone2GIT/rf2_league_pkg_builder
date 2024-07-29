@@ -1,4 +1,4 @@
-#
+ #
 # simple script to build league skin package
 
 # Stone, 07/2024, info@simracingjustfair.org
@@ -8,6 +8,7 @@
 #
 # - checksum of file(s): (Get-FileHash <file>).hash
 
+# we need this for UNiX time in seconds
 [DateTimeOffset]::Now.ToUnixTimeSeconds()
 
 # source variables
@@ -65,7 +66,6 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^Version=.*","Version=$CURRENTVERSION")
 
  # set UNiX timestamp / date
- #$UNIXTIME = Get-Date #or any other command to get DateTime object
  $UNIXTIME=(([DateTimeOffset](Get-Date)).ToUnixTimeSeconds())
  $CMPINFO=($CMPINFO -replace "^Date=.*","Date=$UNIXTIME")
 
@@ -86,20 +86,63 @@ forEach ($COMPONENT in $COMPONENTS)
  # is there any other ...?
  $MASFILE=(((Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
 
- # get all files which are in $COMPONENT
- $CHECKFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT")
- 
- # if a mas file already exists or not ...
+ # if a mas file already exists we will extract it in order to do a default named masfile
  if ( $MASFILE ) {
     write-host "MAS file found "$MASFILE
-    write-host "Building RFCMP for "$COMPONENT
+    write-host "Extracting for "$COMPONENT
 
-    # arguments for modmgr
-    $ARGUMENTS=" -l""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Log\content-existing-masfile-$COMPONENT-$CURRENTVERSION.txt"" "
+    # arguments for extraction
+    $ARGUMENTS=" *.* -x""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" -o""$CURRENTLOCATION\Vehicles\$COMPONENT"" "
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow -Wait
-    }
- elseif ( $CHECKFILES ) {
 
+    # remove the masfile because we have everything extracted
+    remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
+    }
+
+ # get all files which are in $COMPONENT in order to build checksum
+ if (-not (Test-Path $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt))
+ {
+  New-Item -ItemType File -Path $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+ }
+
+ $SKINFILES=(Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT" -Exclude checksums.txt).Name
+ forEach ($SKINFILE in $SKINFILES)
+ {
+     $CHECKSUM=(Get-FileHash $CURRENTLOCATION\Vehicles\$COMPONENT\$SKINFILE).hash
+
+     $SUM2COMPARE=((Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt"|select-string -Pattern $SKINFILE+"=") -split("=") | select-object -Last 1)
+
+    if ($CHECKSUM -ne $SUM2COMPARE) 
+     {
+      write-host "Checksum for "$SKINFILE" does not match, update required."
+
+      if ( (Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt"|select-string -Pattern $SKINFILE+":") )
+      {
+       $CHECKSUMFILE=(Get-Content "$CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt")
+       $CHECKSUMFILE -replace "$SKINFILE=.*","$SKINFILE=$SUM2COMPARE" | Out-File $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+      } else
+      {
+       $SKINFILE+"="+$CHECKSUM | Out-File -Append $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt
+      }
+
+      $UPDATERFCMP=1
+     }
+ }
+
+  # remove any previously (old) rfcmps of the component
+ $OLDRFCMPS=((Get-ChildItem $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
+ 
+# remove old RFCMPs ...
+ if ($OLDRFCMPS){
+  forEach($OLDRFCMP in $OLDRFCMPS)
+  {
+   write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
+   remove-item $CURRENTLOCATION\content\$OLDRFCMP
+  }
+ }
+
+ if ($UPDATERFCMP -eq 1)
+ {
     write-host "Packing masfile for RFCMP "$COMPONENT
 
     # as this is the name of the mas file if we build it ...
@@ -111,32 +154,20 @@ forEach ($COMPONENT in $COMPONENTS)
     # run modmgr to build mas file
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
 
-    write-host "Building RFCMP for "$COMPONENT
+ write-host "Listing all files in "$MASFILE" for logging."
 
-    # building arguments to build rfcmp
+    # arguments to list all files in masfile
     $ARGUMENTS=" -l""$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE"" ""$CURRENTLOCATION\Log\content-generated-masfile-$COMPONENT-$CURRENTVERSION.txt"" "
 
-    # run modmgr to build rfcmp file
+    # run modmgr
     start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
     
- }
- #exit 1
+   write-host "Building RFCMP for "$COMPONENT
 
  # change vehicle.dat file to add mas file
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
 
- # remove any previously (old) rfcmps of the component
- $OLDRFCMPS=((Get-ChildItem $CURRENTLOCATION\Content -Name)|select-string -Pattern $COMPONENT)
- 
-if ( $MASFILE ) {
 
- if ($OLDRFCMPS){
-  forEach($OLDRFCMP in $OLDRFCMPS)
-  {
-   write-host "Deleting previous version of "$COMPONENT" rfcmp in content folder."
-   remove-item -Verbose $CURRENTLOCATION\content\$OLDRFCMP
-  }
- }
 
  #
  write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
@@ -159,7 +190,8 @@ if ( $MASFILE ) {
  remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
  }
 
-}
+ $UPDATERFCMP=0
+ }
 
 # prepare Steam Workshop Upload
 #
@@ -204,19 +236,19 @@ if ( Test-Path "$CURRENTLOCATION\metadata.vdf" -PathType Leaf )
   remove-item $CURRENTLOCATION\steamcmd.zip
  }
 
- write-host "Uploading files to Steam workshop."
+ # call Steamcmd and upload the stuff
+ if ( ($STEAMUPLOAD -eq "true") -and ($STEAMUSER -ne "changeme") -and ($STEAMPASSWORD -ne "changeme") )
+ {
+     write-host "Uploading files to Steam workshop."
 
- # building arguments for SteamCMD call ... remember to register the system with Steam guard code if configured (2FA)
- $ARGUMENTS=" +login ""$STEAMUSER"" ""$STEAMPASSWORD"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
- 
-  # call Steamcmd and upload the stuff
- if ( ($STEAMUPLOAD -eq "true") -and ($STEAMUSER -ne "changeme") -and ($STEAMPASSWORD -ne "changeme") ) {
-  # would we avoid PHP timeout if -Wait is being removed?
-  start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS # -NoNewWindow -Wait
- } 
+     # building arguments for SteamCMD call ... remember to register the system with Steam guard code if configured (2FA)
+     $ARGUMENTS=" +login ""$STEAMUSER"" ""$STEAMPASSWORD"" +workshop_build_item $CURRENTLOCATION\metadata.vdf +quit"
 
+     # would we avoid PHP timeout if -Wait is being removed?
+     start-process -FilePath "$CURRENTLOCATION\SteamCMD\SteamCMD.exe" -ArgumentList $ARGUMENTS # -NoNewWindow -Wait
+ }
 }
 else 
 { 
  write-host "metadata.vdf missing for Steam workshop upload."
-}
+} 
