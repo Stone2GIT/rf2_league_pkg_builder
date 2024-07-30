@@ -33,7 +33,7 @@ if (-not ( "$CURRENTVERSION" ))
 $CURRENTLOCATION=((Get-Location).Path)
 
 # has  prepare.ps1 been run?
-if (-not (Test-Path "$CURRENTLOCATION\\Vehicles" -PathType Container))
+if (-not (Test-Path "$CURRENTLOCATION\Vehicles" -PathType Container))
  {
   write-host "Please run prepare.ps1."
   timeout /t 10
