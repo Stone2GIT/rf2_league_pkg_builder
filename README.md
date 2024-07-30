@@ -14,7 +14,7 @@ All scripts are provided "as is" - no warranty for correct functionality.
 
 - remember to run steamcmd.exe with valid login data once before if Steam Guard e.g. is being used.
 
-- generating RFCMPs only if file checksum missing or not matching (not respecting deleted files, but added ones)
+- generating RFCMPs if something has changed in COMPONENT directory
 
 ## Quick start guide
 
