@@ -19,7 +19,7 @@ $STEAMPASSWORD="changeme"
 $RFCMPPREFIX="SRC"
 
 #
-$CURRENTVERSIONPREFIX="3.61-GTW"
+$CURRENTVERSIONPREFIX="3.61-GTW24-"
 $CURRENTVERSIONTAG=(Get-Date -Format "yyMMdd")
 
 # version for packages - if left blank todays date will be used
