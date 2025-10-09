@@ -93,8 +93,10 @@ forEach ($COMPONENT in $COMPONENTS)
   }
 
  # is there any other ...?
- $MASFILE=(((Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
+ $MASFILES=(((Get-ChildItem -Path "$CURRENTLOCATION\Vehicles\$COMPONENT").Name) | select-string -Pattern ".mas")
 
+ forEach ($MASFILE in $MASFILES)
+  { 
  # if a mas file already exists we will extract it in order to do a default named masfile
  if ( $MASFILE ) {
     write-host "MAS file found "$MASFILE
@@ -107,6 +109,7 @@ forEach ($COMPONENT in $COMPONENTS)
     # remove the masfile because we have everything extracted
     remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
     }
+  }
 
  # if there is no checksums.txt create an empty one
  if (-not (Test-Path $CURRENTLOCATION\Vehicles\$COMPONENT\checksums.txt))
