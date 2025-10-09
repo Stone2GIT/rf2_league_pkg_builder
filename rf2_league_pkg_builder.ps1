@@ -79,10 +79,10 @@ forEach ($COMPONENT in $COMPONENTS)
  $CMPINFO=($CMPINFO -replace "^Date=.*","Date=$UNIXTIME")
 
 
- # this will read the base version from component directory ... hopefully
+ # this will read the base version from component directory ... hopefully (ATTENTION: only numeric folder names are taken)
  $BASEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
 
- # this will read latest installed version from component directory ... as found by sorting
+ # this will read latest installed version from component directory ... as found by sorting (ATTENTION: only numeric folder names are taken)
  $UPDATEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -last 1)
 
  # change vehicle.dat
