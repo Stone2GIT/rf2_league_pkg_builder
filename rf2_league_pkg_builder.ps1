@@ -85,9 +85,14 @@ forEach ($COMPONENT in $COMPONENTS)
  # this will read latest installed version from component directory ... as found by sorting (ATTENTION: only numeric folder names are taken)
  $UPDATEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -last 1)
 
+ # get file signature from last (numeric) folders .mft file
+ $SIGNATURE=(gc $RF2ROOT\Installed\Vehicles\$COMPONENT\$UPDATEVERSION\$COMPONENT.mft| select-string -pattern "^Signature="
+
  # change vehicle.dat
  $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
  $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
+ $CMPINFO=($CMPINFO -replace "^BaseSignature=.*","$SIGNATURE")
+ $CMPINFO=($CMPINFO -replace "^Signature=.*","BaseSignature=")
 
  # lookup if there is an old mas file in $COMPONENT
  if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas" ) 
