@@ -68,36 +68,36 @@ forEach ($COMPONENT in $COMPONENTS)
   }
  
  # get the information for the rfcmp from template
- $CMPINFO=(get-content $CURRENTLOCATION\vehicle.dat)
+ $CMPINFO=(get-content $CURRENTLOCATION\cmpinfo.dat)
 
- # change rfcmp template
- $CMPINFO=($CMPINFO -replace "^Name=.*","Name=$COMPONENT")
- $CMPINFO=($CMPINFO -replace "^Version=.*","Version=$CURRENTVERSION")
+ # this will read latest installed version from component directory ... as found by sorting (ATTENTION: alpha-numeric)
+ $UPDATEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) | sort-object | select-object -last 1)
+
+ # get file signature from last (numeric) folders .mft file
+ $SIGNATURE=(gc $RF2ROOT\Installed\Vehicles\$COMPONENT\$UPDATEVERSION\$COMPONENT.mft| select-string -pattern "^Signature=")
 
  # set UNiX timestamp / date
  $UNIXTIME=(([DateTimeOffset](Get-Date)).ToUnixTimeSeconds())
  $CMPINFO=($CMPINFO -replace "^Date=.*","Date=$UNIXTIME")
 
+ # change cmpinfo.dat
 
- # this will read the base version from component directory ... hopefully (ATTENTION: only numeric folder names are taken)
- $BASEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -first 1)
+ # change rfcmp template
+ $CMPINFO=($CMPINFO -replace "^Name=.*","Name=$COMPONENT")
+ $CMPINFO=($CMPINFO -replace "^Version=.*","Version=$UPDATEVERSION-$CURRENTVERSION")
 
- # this will read latest installed version from component directory ... as found by sorting (ATTENTION: only numeric folder names are taken)
- $UPDATEVERSION=(((Get-ChildItem $RF2ROOT\Installed\Vehicles\$COMPONENT -Directory).Name) -match '\d{1,}\.\d{1,}$'| sort-object | select-object -last 1)
+ # for an update we need to specify UPDATEVERSION
+ $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$UPDATEVERSION")
 
- # get file signature from last (numeric) folders .mft file
- $SIGNATURE=(gc $RF2ROOT\Installed\Vehicles\$COMPONENT\$UPDATEVERSION\$COMPONENT.mft| select-string -pattern "^Signature="
-
- # change vehicle.dat
- $CMPINFO=($CMPINFO -replace "^BaseVersion=.*","BaseVersion=$BASEVERSION")
- $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX-${COMPONENT}-$CURRENTVERSION.rfcmp")
  $CMPINFO=($CMPINFO -replace "^BaseSignature=.*","$SIGNATURE")
- $CMPINFO=($CMPINFO -replace "^Signature=.*","BaseSignature=")
+ $CMPINFO=($CMPINFO -replace "^Signature=","BaseSignature=")
+
+ $CMPINFO=($CMPINFO -replace "^Location=.*","Location=$CURRENTLOCATION\Content\$RFCMPPREFIX${COMPONENT}-${UPDATEVERSION}-$CURRENTVERSION.rfcmp")
 
  # lookup if there is an old mas file in $COMPONENT
- if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas" ) 
+ if ( Test-Path "$CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX.mas" ) 
   { 
-   remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX-skins.mas 
+   remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$RFCMPPREFIX.mas 
   }
 
  # is there any other ...?
@@ -199,7 +199,14 @@ forEach ($COMPONENT in $COMPONENTS)
     $CMPPATH="$CURRENTLOCATION\Vehicles\$COMPONENT"
 
     # as this is the name of the mas file if we build it ...
-    $MASFILE="$RFCMPPREFIX-skins.mas"
+
+    $MASFILE="$RFCMPPREFIX.mas"
+
+    # we need a RFCMP prefix ...
+    if (-not ( "$RFCMPPREFIX" ))
+     {
+      $MASFILE="car-upgrades.mas"
+     }
 
     # build argument list for modmgr
     $ARGUMENTS=" -m""$CMPPATH\$MASFILE"" ""$CMPPATH\*.json"" ""$CMPPATH\*.dds"" ""$CMPPATH\*.veh"" ""$CMPPATH\*.png"" ""$CMPPATH\*.ini"""
@@ -217,18 +224,18 @@ forEach ($COMPONENT in $COMPONENTS)
     
    write-host "Building RFCMP for "$COMPONENT
 
- # change vehicle.dat file to add mas file
+ # change cmpinfo.dat file to add mas file
  $CMPINFO=($CMPINFO -replace "^MASFile=.*","MASFile=$CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE")
 
  #
- write-host "Building RFCMP for "$COMPONENT" with version "$CURRENTVERSION
+ write-host "Building RFCMP for "$COMPONENT" with version "$UPDATEVERSION"-"$CURRENTVERSION
 
  # write the rfcmp definition
- $CMPINFO | Out-File "$CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat" -Encoding ASCII
+ $CMPINFO | Out-File "$CURRENTLOCATION\$COMPONENT-$UPDATEVERSION-$CURRENTVERSION.dat" -Encoding ASCII
 
  # build argument list for modmgr
- $ARGUMENTS=" -b""$CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat"" 0 "
-    
+ $ARGUMENTS=" -c""$RF2ROOT"" -b""$CURRENTLOCATION\$COMPONENT-$UPDATEVERSION-$CURRENTVERSION.dat"" 0 "
+    $ARGUMENTS
  # run modmgr to build rfcmp
  start-process -FilePath "$RF2ROOT\bin64\ModMgr.exe" -ArgumentList $ARGUMENTS -NoNewWindow  -Wait
 
@@ -236,9 +243,10 @@ forEach ($COMPONENT in $COMPONENTS)
  #remove-item $CURRENTLOCATION\$COMPONENT.dat
 
  # move the definition file to log folder
- move-item $CURRENTLOCATION\$COMPONENT-$CURRENTVERSION.dat Log\ -Force
+ move-item $CURRENTLOCATION\$COMPONENT-$UPDATEVERSION-$CURRENTVERSION.dat Log\ -Force
 
- remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
+ #remove-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE
+ move-item $CURRENTLOCATION\Vehicles\$COMPONENT\$MASFILE Log\$COMPONENT-$UPDATEVERSION-$MASFILE
  }
 
  # set the marker to 0 as we have build a new RFCMP
