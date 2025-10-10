@@ -2,7 +2,7 @@
 
 ## General
 
-This script will build rfcmp skin packages for installed cars and upload them to Steam Workshop (if enabled).
+This script will build rfcmp update packages for installed cars and upload them to Steam Workshop (if enabled).
 
 ## Disclaimer
 
@@ -10,11 +10,13 @@ All scripts are provided "as is" - no warranty for correct functionality.
 
 ## Note(s)
 
+- update package is built for the latest installed version of car and modmgr should show "update available" for the base version
+
 - if using automatic Steam workshop upload passwords with some special characters will cause problems handling them in variables.
 
 - remember to run steamcmd.exe with valid login data once before if Steam Guard e.g. is being used.
 
-- generating RFCMPs if something has changed in COMPONENT directory
+- generating RFCMPs if something has changed in VEHICLES directory
 
 ## Quick start guide
 
